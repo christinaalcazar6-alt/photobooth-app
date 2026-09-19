@@ -1,0 +1,173 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #fce4ec;
+  color: #333;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+header h1 {
+  color: #d81b60;
+  font-size: 2.2rem;
+}
+
+.card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+.connection-box {
+  margin: 15px 0;
+}
+
+.id-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+#my-peer-id {
+  font-weight: bold;
+  background: #f1f1f1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+
+button {
+  padding: 10px 18px;
+  border: none;
+  background-color: #f48fb1;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #ad1457;
+}
+
+.primary-btn {
+  background-color: #d81b60;
+  font-size: 1.1rem;
+  padding: 12px 24px;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.video-wrapper {
+  position: relative;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-wrapper span {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+#countdown-display {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d81b60;
+  display: block;
+  margin-top: 10px;
+}
+
+/* Photo Strip Styling */
+.filter-options {
+  margin: 15px 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.strip-container {
+  width: 240px;
+  margin: 20px auto;
+  background: #f8bbd0;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+#strip-header {
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  color: #880e4f;
+}
+
+.strip-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.strip-photos canvas {
+  width: 100%;
+  border-radius: 4px;
+  background: white;
+}
+
+#strip-footer {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  color: #880e4f;
+}
