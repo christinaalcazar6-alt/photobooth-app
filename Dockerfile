@@ -54,5 +54,12 @@ RUN echo 'server {\n\
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Start Nginx and PHP-FPM
-CMD php artisan key:generate --force && php artisan storage:link --force && php artisan config:clear && service nginx start && php-fpm
+# Copy entrypoint script at gawing executable
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose port
+EXPOSE 80
+
+# Run entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
