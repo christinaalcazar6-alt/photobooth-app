@@ -1,6 +1,15 @@
+# Step 1: Build frontend assets using Node.js
+FROM node:20 AS frontend
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Step 2: Set up PHP and Nginx
 FROM php:8.3-fpm
 
-# Install system dependencies (kasama ang Node.js at NPM para sa asset compilation)
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -9,42 +18,45 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip \
-    nodejs \
-    npm
+    unzip
 
-# Clear apt cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get latest Composer
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www
 
 # Copy application files
 COPY . /var/www
 
-# Install Composer dependencies, NPM packages, and build assets
-RUN composer install --no-dev --optimize-autoloader \
-    && npm install \
-    && npm run build
+# Copy compiled frontend assets from Step 1
+COPY --from=frontend /app/public/build /var/www/public/build
 
-# Setup Nginx configuration
-COPY .docker/nginx.conf /etc/nginx/sites-available/default
+# Install Composer dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Set proper permissions for Laravel
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Configure Default Nginx Site
+RUN echo 'server {\n\
+    listen 80;\n\
+    index index.php index.html;\n\
+    root /var/www/public;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.php?$query_string;\n\
+    }\n\
+    location ~ \.php$ {\n\
+        fastcgi_pass 127.0.0.1:9000;\n\
+        fastcgi_index index.php;\n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
+        include fastcgi_params;\n\
+    }\n\
+}' > /etc/nginx/sites-available/default
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose HTTP port
 EXPOSE 80
 
-# Run entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
