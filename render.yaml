@@ -1,6 +1,7 @@
-type: web
-name: photobooth-app
-env: php
-plan: free
-buildCommand: composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache
-startCommand: vendor/bin/heroku-php-nginx public/
+services:
+  - type: web
+    name: photobooth-app
+    runtime: php
+    plan: free
+    buildCommand: composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache
+    startCommand: vendor/bin/heroku-php-nginx public/
