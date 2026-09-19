@@ -1,7 +1,8 @@
 FROM php:8.3-fpm
 
-# Install system dependencies
+# Install system dependencies (kasama ang Node.js at NPM para sa asset compilation)
 RUN apt-get update && apt-get install -y \
+    nginx \
     git \
     curl \
     libpng-dev \
@@ -9,9 +10,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    nginx
+    nodejs \
+    npm
 
-# Clear cache
+# Clear apt cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -23,42 +25,25 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory contents
+# Copy application files
 COPY . /var/www
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install Composer dependencies, NPM packages, and build assets
+RUN composer install --no-dev --optimize-autoloader \
+    && npm install \
+    && npm run build
 
-# Nginx configuration
-RUN echo 'server {\n\
-    listen 80;\n\
-    index index.php index.html;\n\
-    error_log  /var/log/nginx/error.log;\n\
-    access_log /var/log/nginx/access.log;\n\
-    root /var/www/public;\n\
-    location ~ \.php$ {\n\
-        try_files $uri =404;\n\
-        fastcgi_split_path_info ^(.+?\.php)(/.*)$;\n\
-        fastcgi_pass 127.0.0.1:9000;\n\
-        fastcgi_index index.php;\n\
-        include fastcgi_params;\n\
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
-        fastcgi_param PATH_INFO $fastcgi_path_info;\n\
-    }\n\
-    location / {\n\
-        try_files $uri $uri/ /index.php?$query_string;\n\
-        gzip_static on;\n\
-    }\n\
-}' > /etc/nginx/sites-available/default
+# Setup Nginx configuration
+COPY .docker/nginx.conf /etc/nginx/sites-available/default
 
-# Set permissions
+# Set proper permissions for Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Copy entrypoint script at gawing executable
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose port
+# Expose HTTP port
 EXPOSE 80
 
 # Run entrypoint script
